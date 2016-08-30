@@ -27,10 +27,14 @@ func NewHTMLTag(value string) *HTMLTag {
 	}
 }
 
-func (t *HTMLTag) String() string {
+func (t *HTMLTag) String(escapeHTML bool) string {
 	var value string
 	if len(t.Value) > 0 {
-		value = html.EscapeString(t.Value)
+		if escapeHTML {
+			value = html.EscapeString(t.Value)
+		} else {
+			value = t.Value
+		}
 	}
 	var attrString string
 	for key, value := range t.Attrs {
@@ -39,7 +43,7 @@ func (t *HTMLTag) String() string {
 	if len(t.Children) > 0 {
 		var childrenString string
 		for _, child := range t.Children {
-			childrenString += child.String()
+			childrenString += child.String(escapeHTML)
 		}
 		if len(t.Name) > 0 {
 			return value + "<" + t.Name + attrString + ">" + childrenString + "</" + t.Name + ">"

@@ -17,10 +17,11 @@ type Compiler struct {
 	defaultCompiler            TagCompilerFunc
 	AutoCloseTags              bool
 	IgnoreUnmatchedClosingTags bool
+	EscapeHTML                 bool
 }
 
-func NewCompiler(autoCloseTags, ignoreUnmatchedClosingTags bool) Compiler {
-	compiler := Compiler{make(map[string]TagCompilerFunc), DefaultTagCompiler, autoCloseTags, ignoreUnmatchedClosingTags}
+func NewCompiler(autoCloseTags, ignoreUnmatchedClosingTags, escapeHTML bool) Compiler {
+	compiler := Compiler{make(map[string]TagCompilerFunc), DefaultTagCompiler, autoCloseTags, ignoreUnmatchedClosingTags, escapeHTML}
 
 	for tag, compilerFunc := range DefaultTagCompilers {
 		compiler.SetTag(tag, compilerFunc)
@@ -31,7 +32,7 @@ func NewCompiler(autoCloseTags, ignoreUnmatchedClosingTags bool) Compiler {
 func (c Compiler) Compile(str string) string {
 	tokens := Lex(str)
 	tree := Parse(tokens)
-	return c.CompileTree(tree).String()
+	return c.CompileTree(tree).String(c.EscapeHTML)
 }
 
 func (c Compiler) SetDefault(compiler TagCompilerFunc) {
